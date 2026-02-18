@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penta Square</title>
+  <style>
+    .matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+    }
+    
+    .matrix .row {
+      display: flex;
+      gap: 0px;
+    }
+    
+    .matrix .row div {
+      width: 60px;
+      height: 60px;
+      background: #eee;
+    }
+    .bucket-space {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .bucket-space .row {
+      display: flex;
+      gap: 5px;
+    }
+    .bucket-space .row .bucket {
+      width: 30px;
+      height: 30px;
+      border-radius: 30px;
+      border: 1px solid #DDD;
+    }
+    
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* This will center items horizontally within the column */
+    }
+    
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0; /* Remove default body margin */
+    }
+  </style>
+</head>
+<body>
+  <section class="content">
+    <section class="matrix">
+      <div class="row">
+        <div id="1-1"></div>
+        <div id="1-2"></div>
+        <div id="1-3"></div>
+        <div id="1-4"></div>
+        <div id="1-5"></div>
+      </div>
+      
+      <div class="row">
+        <div id="2-1"></div>
+        <div id="2-2"></div>
+        <div id="2-3"></div>
+        <div id="2-4"></div>
+        <div id="2-5"></div>
+      </div>
+      
+      <div class="row">
+        <div id="3-1"></div>
+        <div id="3-2"></div>
+        <div id="3-3"></div>
+        <div id="3-4"></div>
+        <div id="3-5"></div>
+      </div>
+      
+      <div class="row">
+        <div id="4-1"></div>
+        <div id="4-2"></div>
+        <div id="4-3"></div>
+        <div id="4-4"></div>
+        <div id="4-5"></div>
+      </div>
+      
+      <div class="row">
+        <div id="5-1"></div>
+        <div id="5-2"></div>
+        <div id="5-3"></div>
+        <div id="5-4"></div>
+        <div id="5-5"></div>
+      </div>
+    </section>
+    <section class="bucket-space">
+      <div class="row">
+        <div class="bucket" style="background-color: #000000;"></div>
+        <div class="bucket" style="background-color: #FFFFFF;"></div>
+        <div class="bucket" style="background-color: #FF0000;"></div>
+        <div class="bucket" style="background-color: #00FF00;"></div>
+        <div class="bucket" style="background-color: #0000FF;"></div>
+        <div class="bucket" style="background-color: #FFFF00;"></div>
+        <div class="bucket" style="background-color: #00FFFF;"></div>
+        <div class="bucket" style="background-color: #FF00FF;"></div>
+      </div>
+      <div class="row">
+        <div class="bucket" style="background-color: #800000;"></div>
+        <div class="bucket" style="background-color: #808000;"></div>
+        <div class="bucket" style="background-color: #008000;"></div>
+        <div class="bucket" style="background-color: #800080;"></div>
+        <div class="bucket" style="background-color: #008080;"></div>
+        <div class="bucket" style="background-color: #000080;"></div>
+        <div class="bucket" style="background-color: #FFA500;"></div>
+        <div class="bucket" style="background-color: #FFC0CB;"></div>
+      </div>
+    </section>
+  </section>
+  <script>
+    const defaultPixelColor = "#EFEFEF";
+    const defaultPixelMapping = {
+      "1-1": defaultPixelColor,
+      "1-2": defaultPixelColor,
+      "1-3": defaultPixelColor,
+      "1-4": defaultPixelColor,
+      "1-5": defaultPixelColor,
+      "2-1": defaultPixelColor,
+      "2-2": defaultPixelColor,
+      "2-3": defaultPixelColor,
+      "2-4": defaultPixelColor,
+      "2-5": defaultPixelColor,
+      "3-1": defaultPixelColor,
+      "3-2": defaultPixelColor,
+      "3-3": defaultPixelColor,
+      "3-4": defaultPixelColor,
+      "3-5": defaultPixelColor,
+      "4-1": defaultPixelColor,
+      "4-2": defaultPixelColor, 
+      "4-3": defaultPixelColor,
+      "4-4": defaultPixelColor,
+      "4-5": defaultPixelColor,
+      "5-1": defaultPixelColor,
+      "5-2": defaultPixelColor,
+      "5-3": defaultPixelColor,
+      "5-4": defaultPixelColor,
+      "5-5": defaultPixelColor
+    }
+
+    const pixelSampleMapping = {
+      "1-2": "#b90000",
+      "1-4": "#b90000",
+      "2-1": "#cd0000",
+      "2-2": "#ff0000",
+      "2-3": "#cd0000",
+      "2-4": "#ff0000",
+      "2-5": "#b90000",
+      "3-1": "#f44637",
+      "3-2": "#ffa7a7",
+      "3-3": "#ff0000",
+      "3-4": "#ff0000",
+      "3-5": "#cd0000",
+      "4-2": "#f44637",
+      "4-3": "#ff9595",
+      "4-4": "#ff0000",
+      "5-3": "#f44637"
+    }
+
+    const pixelColorMap = {
+      ...defaultPixelMapping,
+      ...pixelSampleMapping
+    }
+
+    for(let boxIndex in pixelColorMap){
+      let box = document.getElementById(boxIndex);
+      box.addEventListener('click', function() {
+        this.style.backgroundColor = "#000";
+      })
+      
+      box.style.backgroundColor = pixelColorMap[boxIndex];
+    }
+    
+  </script>
+</body>
+</html>
