@@ -5,183 +5,464 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Penta Square</title>
   <style>
-    .matrix {
-      display: flex;
-      flex-direction: column;
-      gap: 0px;
+    :root {
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-primary: #2d3436;
+      --text-secondary: #636e72;
+      --accent-color: #0984e3;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --transition: all 0.2s ease;
     }
-    
-    .matrix .row {
-      display: flex;
-      gap: 0px;
-    }
-    
-    .matrix .row div {
-      width: 60px;
-      height: 60px;
-      background: #eee;
-    }
-    .bucket-space {
-      margin-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .bucket-space .row {
-      display: flex;
-      gap: 5px;
-    }
-    .bucket-space .row .bucket {
-      width: 30px;
-      height: 30px;
-      border-radius: 30px;
-      border: 1px solid #DDD;
-    }
-    
-    .content {
-      display: flex;
-      flex-direction: column;
-      align-items: center; /* This will center items horizontally within the column */
-    }
-    
+
     body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0; /* Remove default body margin */
+      margin: 0;
     }
+
+    .app-container {
+      background-color: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: #eee;
+      border-radius: 4px;
+      border: 1px solid #DDD;
+    }
+
+    .matrix div {
+      width: 50px;
+      height: 50px;
+      background-color: #fff;
+      cursor: pointer;
+      transition: background-color 0.1s ease;
+    }
+
+    .matrix div:hover {
+      opacity: 0.9;
+      transform: scale(0.98);
+    }
+
+    .palette-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .palette-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .palette-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .bucket {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .bucket:hover {
+      transform: scale(1.1);
+    }
+
+    .bucket.selected {
+      border-color: var(--text-primary);
+      transform: scale(1.1);
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      background: none;
+      border: 1px solid #dfe6e9;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    button:hover {
+      background-color: #f1f2f6;
+      color: var(--text-primary);
+      border-color: #b2bec3;
+    }
+
+    button.primary {
+      background-color: var(--text-primary);
+      color: white;
+      border-color: var(--text-primary);
+    }
+
+    button.primary:hover {
+      background-color: #000;
+      border-color: #000;
+      color: white;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text-secondary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #dfe6e9;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    /* States */
+    #modal-form, #modal-loading, #modal-success {
+      display: none;
+    }
+
+    #modal-loading {
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .success-icon {
+      color: #27ae60;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    #modal-success {
+      text-align: center;
+    }
+
   </style>
 </head>
 <body>
-  <section class="content">
-    <section class="matrix">
-      <div class="row">
-        <div id="1-1"></div>
-        <div id="1-2"></div>
-        <div id="1-3"></div>
-        <div id="1-4"></div>
-        <div id="1-5"></div>
+
+  <div class="app-container">
+    <header>
+      <h1>Penta Square</h1>
+      <p>Select a color and paint pixels.</p>
+    </header>
+
+    <div class="matrix" id="grid">
+      <!-- Grid generated by JS -->
+    </div>
+
+    <div class="palette-container">
+      <div class="palette-label">Palette</div>
+      <div class="palette-grid" id="palette">
+        <!-- Palette generated by JS -->
       </div>
-      
-      <div class="row">
-        <div id="2-1"></div>
-        <div id="2-2"></div>
-        <div id="2-3"></div>
-        <div id="2-4"></div>
-        <div id="2-5"></div>
+      <input type="color" id="custom-color-input" style="display: none;">
+    </div>
+
+    <div class="actions">
+      <button onclick="resetGrid()">Clear Canvas</button>
+      <button class="primary" onclick="openSubmitModal()">Submit</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <!-- Form State -->
+      <div id="modal-form">
+        <h2>Submit Your Art</h2>
+        <div class="form-group">
+          <label for="artName">Art Name</label>
+          <input type="text" id="artName" placeholder="Give your art a name">
+        </div>
+        <div class="form-group">
+          <label for="authorName">Your Name</label>
+          <input type="text" id="authorName" placeholder="Who created this?">
+        </div>
+        <div class="modal-actions">
+          <button onclick="closeModal()">Cancel</button>
+          <button class="primary" onclick="processSubmission()">Send Art</button>
+        </div>
       </div>
-      
-      <div class="row">
-        <div id="3-1"></div>
-        <div id="3-2"></div>
-        <div id="3-3"></div>
-        <div id="3-4"></div>
-        <div id="3-5"></div>
+
+      <!-- Loading State -->
+      <div id="modal-loading">
+        <div class="spinner"></div>
+        <p>Submitting your masterpiece...</p>
       </div>
-      
-      <div class="row">
-        <div id="4-1"></div>
-        <div id="4-2"></div>
-        <div id="4-3"></div>
-        <div id="4-4"></div>
-        <div id="4-5"></div>
+
+      <!-- Success State -->
+      <div id="modal-success">
+        <div class="success-icon">✓</div>
+        <h2>Success!</h2>
+        <p>Your art has been submitted.</p>
+        <div class="modal-actions" style="justify-content: center;">
+          <button class="primary" onclick="closeModal()">Awesome</button>
+        </div>
       </div>
-      
-      <div class="row">
-        <div id="5-1"></div>
-        <div id="5-2"></div>
-        <div id="5-3"></div>
-        <div id="5-4"></div>
-        <div id="5-5"></div>
-      </div>
-    </section>
-    <section class="bucket-space">
-      <div class="row">
-        <div class="bucket" style="background-color: #000000;"></div>
-        <div class="bucket" style="background-color: #FFFFFF;"></div>
-        <div class="bucket" style="background-color: #FF0000;"></div>
-        <div class="bucket" style="background-color: #00FF00;"></div>
-        <div class="bucket" style="background-color: #0000FF;"></div>
-        <div class="bucket" style="background-color: #FFFF00;"></div>
-        <div class="bucket" style="background-color: #00FFFF;"></div>
-        <div class="bucket" style="background-color: #FF00FF;"></div>
-      </div>
-      <div class="row">
-        <div class="bucket" style="background-color: #800000;"></div>
-        <div class="bucket" style="background-color: #808000;"></div>
-        <div class="bucket" style="background-color: #008000;"></div>
-        <div class="bucket" style="background-color: #800080;"></div>
-        <div class="bucket" style="background-color: #008080;"></div>
-        <div class="bucket" style="background-color: #000080;"></div>
-        <div class="bucket" style="background-color: #FFA500;"></div>
-        <div class="bucket" style="background-color: #FFC0CB;"></div>
-      </div>
-    </section>
-  </section>
+    </div>
+  </div>
+
   <script>
-    const defaultPixelColor = "#EFEFEF";
-    const defaultPixelMapping = {
-      "1-1": defaultPixelColor,
-      "1-2": defaultPixelColor,
-      "1-3": defaultPixelColor,
-      "1-4": defaultPixelColor,
-      "1-5": defaultPixelColor,
-      "2-1": defaultPixelColor,
-      "2-2": defaultPixelColor,
-      "2-3": defaultPixelColor,
-      "2-4": defaultPixelColor,
-      "2-5": defaultPixelColor,
-      "3-1": defaultPixelColor,
-      "3-2": defaultPixelColor,
-      "3-3": defaultPixelColor,
-      "3-4": defaultPixelColor,
-      "3-5": defaultPixelColor,
-      "4-1": defaultPixelColor,
-      "4-2": defaultPixelColor, 
-      "4-3": defaultPixelColor,
-      "4-4": defaultPixelColor,
-      "4-5": defaultPixelColor,
-      "5-1": defaultPixelColor,
-      "5-2": defaultPixelColor,
-      "5-3": defaultPixelColor,
-      "5-4": defaultPixelColor,
-      "5-5": defaultPixelColor
+    const ROWS = 5;
+    const COLS = 5;
+
+    let selectedColor = "#000000";
+    let customColor = "#000000";
+
+    const colors = [
+      "#000000", "#555555", "#AAAAAA", "#FFFFFF",
+      "#FF0000", "#00FF00", "#0000FF", "#FFFF00",
+      "#00FFFF", "#FF00FF", "#FFA500", "#800080",
+      "#FFC0CB", "#008080", "#A52A2A"
+    ];
+
+    let initialPattern = {
+      "1": "#d70035", "2": "#ca0025", "3": "#fb3a66",
+      "5": "#c30033", "6": "#d2c5b2", "7": "#e51f42", "8": "#d1072d", "9": "#ff3467",
+      "10": "#ff3c67", "11": "#e62446", "12": "#e31d38", "13": "#ea2340", "14": "#f7204a",
+      "17": "#627468", "22": "#f9f5f2"
+    };
+
+    function init() {
+      renderGrid();
+      renderPalette();
+      setupCustomColor();
+      applyInitialPattern();
     }
 
-    const pixelSampleMapping = {
-      "1-2": "#b90000",
-      "1-4": "#b90000",
-      "2-1": "#cd0000",
-      "2-2": "#ff0000",
-      "2-3": "#cd0000",
-      "2-4": "#ff0000",
-      "2-5": "#b90000",
-      "3-1": "#f44637",
-      "3-2": "#ffa7a7",
-      "3-3": "#ff0000",
-      "3-4": "#ff0000",
-      "3-5": "#cd0000",
-      "4-2": "#f44637",
-      "4-3": "#ff9595",
-      "4-4": "#ff0000",
-      "5-3": "#f44637"
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < ROWS * COLS; i++) {
+        const cell = document.createElement('div');
+        cell.id = `cell-${i}`;
+        cell.addEventListener('click', () => paintCell(cell));
+        grid.appendChild(cell);
+      }
     }
 
-    const pixelColorMap = {
-      ...defaultPixelMapping,
-      ...pixelSampleMapping
+    function renderPalette() {
+      const palette = document.getElementById('palette');
+      palette.innerHTML = '';
+      colors.forEach(color => {
+        const bucket = document.createElement('div');
+        bucket.className = 'bucket';
+        bucket.style.backgroundColor = color;
+        if (color === '#FFFFFF') bucket.style.border = '1px solid #ddd';
+        if (color === selectedColor) bucket.classList.add('selected');
+        bucket.addEventListener('click', () => selectColor(color, bucket));
+        palette.appendChild(bucket);
+      });
+
+      const customBucket = document.createElement('div');
+      customBucket.className = 'bucket custom-bucket';
+      customBucket.id = 'custom-bucket';
+      customBucket.style.backgroundColor = customColor;
+      customBucket.innerHTML = '<span style="font-size: 18px; color: #fff; text-shadow: 0 0 2px #000; line-height: 32px; display: block; text-align: center;">+</span>';
+      customBucket.addEventListener('click', () => document.getElementById('custom-color-input').click());
+      palette.appendChild(customBucket);
     }
 
-    for(let boxIndex in pixelColorMap){
-      let box = document.getElementById(boxIndex);
-      box.addEventListener('click', function() {
-        this.style.backgroundColor = "#000";
-      })
-      
-      box.style.backgroundColor = pixelColorMap[boxIndex];
+    function setupCustomColor() {
+      const input = document.getElementById('custom-color-input');
+      input.addEventListener('input', (e) => {
+        customColor = e.target.value;
+        document.getElementById('custom-bucket').style.backgroundColor = customColor;
+        selectColor(customColor, document.getElementById('custom-bucket'));
+      });
     }
-    
+
+    function selectColor(color, element) {
+      selectedColor = color;
+      document.querySelectorAll('.bucket').forEach(b => b.classList.remove('selected'));
+      element.classList.add('selected');
+    }
+
+    function paintCell(cell) {
+      cell.style.backgroundColor = selectedColor;
+      cell.dataset.color = selectedColor;
+    }
+
+    function applyInitialPattern() {
+      for (const [index, color] of Object.entries(initialPattern)) {
+        const cell = document.getElementById(`cell-${index}`);
+        if (cell) {
+          cell.style.backgroundColor = color;
+          cell.dataset.color = color;
+        }
+      }
+    }
+
+    function resetGrid() {
+      document.querySelectorAll('.matrix div').forEach(cell => {
+        cell.style.backgroundColor = '';
+        delete cell.dataset.color;
+      });
+    }
+
+    function openSubmitModal() {
+      document.getElementById('modalOverlay').style.display = 'flex';
+      showModalState('form');
+      document.getElementById('artName').value = '';
+      document.getElementById('authorName').value = '';
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+    function showModalState(state) {
+      document.getElementById('modal-form').style.display = state === 'form' ? 'block' : 'none';
+      document.getElementById('modal-loading').style.display = state === 'loading' ? 'block' : 'none';
+      document.getElementById('modal-success').style.display = state === 'success' ? 'block' : 'none';
+    }
+
+    async function processSubmission() {
+      const artName = document.getElementById('artName').value.trim();
+      const authorName = document.getElementById('authorName').value.trim();
+      if (!artName || !authorName) return alert("Both fields are required!");
+
+      showModalState('loading');
+      const mapping = {};
+      for (let i = 0; i < ROWS * COLS; i++) {
+        const color = document.getElementById(`cell-${i}`).dataset.color;
+        if (color) {
+          mapping[i] = color;
+        }
+      }
+
+      try {
+        const response = await fetch('/art', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: artName, author: authorName, mapping })
+        });
+        if (response.ok) showModalState('success');
+        else {
+          const error = await response.json().catch(() => ({}));
+          alert('Failed: ' + (error.message || response.statusText));
+          showModalState('form');
+        }
+      } catch (e) {
+        alert('An error occurred.');
+        showModalState('form');
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
