@@ -323,10 +323,10 @@
     let customColor = "#000000";
 
     const colors = [
-      "#000000", "#555555", "#AAAAAA", "#FFFFFF",
-      "#FF0000", "#00FF00", "#0000FF", "#FFFF00",
-      "#00FFFF", "#FF00FF", "#FFA500", "#800080",
-      "#FFC0CB", "#008080", "#A52A2A"
+      "#000000", "#555555", "#aaaaaa", "#ffffff",
+      "#ff0000", "#00ff00", "#0000ff", "#ffff00",
+      "#00ffff", "#ff00ff", "#ffa500", "#800080",
+      "#ffc0cb", "#008080", "#a52a2a"
     ];
 
     let initialPattern = {
@@ -361,7 +361,7 @@
         const bucket = document.createElement('div');
         bucket.className = 'bucket';
         bucket.style.backgroundColor = color;
-        if (color === '#FFFFFF') bucket.style.border = '1px solid #ddd';
+        if (color === '#ffffff') bucket.style.border = '1px solid #ddd';
         if (color === selectedColor) bucket.classList.add('selected');
         bucket.addEventListener('click', () => selectColor(color, bucket));
         palette.appendChild(bucket);
@@ -445,7 +445,7 @@
       }
 
       try {
-        const response = await fetch('/art', {
+        const response = await fetch('/api/art', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: artName, author: authorName, mapping })
