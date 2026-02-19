@@ -15,18 +15,19 @@
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       --transition: all 0.2s ease;
     }
-
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-primary);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 2rem 1rem;
     }
-
+    
     .app-container {
       background-color: var(--card-bg);
       padding: 2rem;
@@ -38,25 +39,26 @@
       gap: 1.5rem;
       max-width: 400px;
       width: 100%;
+      margin-bottom: 3rem;
     }
-
+    
     header {
       text-align: center;
     }
-
+    
     h1 {
       margin: 0 0 0.5rem 0;
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--text-primary);
     }
-
+    
     p {
       margin: 0;
       font-size: 0.9rem;
       color: var(--text-secondary);
     }
-
+    
     .matrix {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -64,7 +66,7 @@
       border-radius: 4px;
       border: 1px solid #DDD;
     }
-
+    
     .matrix div {
       width: 50px;
       height: 50px;
@@ -72,19 +74,19 @@
       cursor: pointer;
       transition: background-color 0.1s ease;
     }
-
+    
     .matrix div:hover {
       opacity: 0.9;
       transform: scale(0.98);
     }
-
+    
     .palette-container {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       width: 100%;
     }
-
+    
     .palette-label {
       font-size: 0.75rem;
       text-transform: uppercase;
@@ -93,39 +95,39 @@
       font-weight: 600;
       text-align: center;
     }
-
+    
     .palette-grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
     }
-
+    
     .bucket {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
       transition: var(--transition);
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
+    
     .bucket:hover {
       transform: scale(1.1);
     }
-
+    
     .bucket.selected {
       border-color: var(--text-primary);
       transform: scale(1.1);
     }
-
+    
     .actions {
       display: flex;
       gap: 1rem;
       margin-top: 0.5rem;
     }
-
+    
     button {
       background: none;
       border: 1px solid #dfe6e9;
@@ -137,32 +139,84 @@
       color: var(--text-secondary);
       transition: var(--transition);
     }
-
+    
     button:hover {
       background-color: #f1f2f6;
       color: var(--text-primary);
       border-color: #b2bec3;
     }
-
+    
     button.primary {
       background-color: var(--text-primary);
       color: white;
       border-color: var(--text-primary);
     }
-
+    
     button.primary:hover {
       background-color: #000;
       border-color: #000;
       color: white;
     }
-
+    
+    /* Gallery Styles */
+    .gallery-container {
+      width: 100%;
+      max-width: 900px;
+    }
+    
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .art-card {
+      background: white;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: var(--transition);
+    }
+    
+    .art-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .art-card svg {
+      width: 120px;
+      height: 120px;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #eee;
+    }
+    
+    .art-info h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    
+    .art-info p {
+      margin: 0.2rem 0 0;
+      font-size: 0.75rem;
+    }
+    
     /* Modal Styles */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0, 0, 0, 0.5);
       display: none;
       justify-content: center;
@@ -170,7 +224,7 @@
       z-index: 1000;
       backdrop-filter: blur(2px);
     }
-
+    
     .modal {
       background: white;
       padding: 2rem;
@@ -179,18 +233,18 @@
       max-width: 320px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
-
+    
     .modal h2 {
       margin-top: 0;
       font-size: 1.25rem;
       margin-bottom: 1rem;
     }
-
+    
     .form-group {
       margin-bottom: 1rem;
       text-align: left;
     }
-
+    
     .form-group label {
       display: block;
       font-size: 0.8rem;
@@ -198,7 +252,7 @@
       margin-bottom: 0.4rem;
       color: var(--text-secondary);
     }
-
+    
     .form-group input {
       width: 100%;
       padding: 0.6rem;
@@ -207,24 +261,23 @@
       font-size: 0.9rem;
       box-sizing: border-box;
     }
-
+    
     .modal-actions {
       display: flex;
       justify-content: flex-end;
       gap: 0.75rem;
       margin-top: 1.5rem;
     }
-
-    /* States */
+    
     #modal-form, #modal-loading, #modal-success {
       display: none;
     }
-
+    
     #modal-loading {
       text-align: center;
       padding: 1rem 0;
     }
-
+    
     .spinner {
       width: 30px;
       height: 30px;
@@ -234,53 +287,66 @@
       animation: spin 1s linear infinite;
       margin: 0 auto 1rem;
     }
-
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
+    
     .success-icon {
       color: #27ae60;
       font-size: 3rem;
       margin-bottom: 1rem;
     }
-
-    #modal-success {
-      text-align: center;
+    
+    #modal-success { text-align: center; }
+    
+    @media (max-width: 600px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
     }
-
+    
   </style>
 </head>
 <body>
-
+  
   <div class="app-container">
     <header>
       <h1>Penta Square</h1>
       <p>Select a color and paint pixels.</p>
     </header>
-
-    <div class="matrix" id="grid">
-      <!-- Grid generated by JS -->
-    </div>
-
+    
+    <div class="matrix" id="grid"></div>
+    
     <div class="palette-container">
       <div class="palette-label">Palette</div>
-      <div class="palette-grid" id="palette">
-        <!-- Palette generated by JS -->
-      </div>
+      <div class="palette-grid" id="palette"></div>
       <input type="color" id="custom-color-input" style="display: none;">
     </div>
-
+    
     <div class="actions">
       <button onclick="resetGrid()">Clear Canvas</button>
       <button class="primary" onclick="openSubmitModal()">Submit</button>
     </div>
   </div>
-
+  
+  <div class="gallery-container">
+    <div class="gallery-header">
+      <h2>Community Gallery</h2>
+      <button onclick="fetchGallery()">Refresh</button>
+    </div>
+    <div class="gallery-grid" id="gallery">
+      <!-- Art cards go here -->
+    </div>
+    <div style="margin-top: 2rem; text-align: center;" id="pagination-container">
+      <button id="load-more" style="display: none;" onclick="fetchGallery(true)">Load More</button>
+    </div>
+  </div>
+  
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-      <!-- Form State -->
       <div id="modal-form">
         <h2>Submit Your Art</h2>
         <div class="form-group">
@@ -296,14 +362,12 @@
           <button class="primary" onclick="processSubmission()">Send Art</button>
         </div>
       </div>
-
-      <!-- Loading State -->
+      
       <div id="modal-loading">
         <div class="spinner"></div>
         <p>Submitting your masterpiece...</p>
       </div>
-
-      <!-- Success State -->
+      
       <div id="modal-success">
         <div class="success-icon">✓</div>
         <h2>Success!</h2>
@@ -314,35 +378,49 @@
       </div>
     </div>
   </div>
-
+  
   <script>
     const ROWS = 5;
     const COLS = 5;
-
     let selectedColor = "#000000";
     let customColor = "#000000";
-
+    let nextCursor = null;
+    
     const colors = [
-      "#000000", "#555555", "#aaaaaa", "#ffffff",
-      "#ff0000", "#00ff00", "#0000ff", "#ffff00",
-      "#00ffff", "#ff00ff", "#ffa500", "#800080",
-      "#ffc0cb", "#008080", "#a52a2a"
+    "#f44336",
+    "#e91e63",
+    "#9c27b0",
+    "#673ab7",
+    "#3f51b5",
+    "#2196f3",
+    "#00bcd4",
+    "#009688",
+    "#4caf50",
+    "#8bc34a",
+    "#cddc39",
+    "#ffeb3b",
+    "#ff9800",
+    "#795548",
+    "#607d8b",
+    "#ffffff",
+    "#000000",
     ];
-
+    
     let initialPattern = {
       "1": "#d70035", "2": "#ca0025", "3": "#fb3a66",
       "5": "#c30033", "6": "#d2c5b2", "7": "#e51f42", "8": "#d1072d", "9": "#ff3467",
       "10": "#ff3c67", "11": "#e62446", "12": "#e31d38", "13": "#ea2340", "14": "#f7204a",
       "17": "#627468", "22": "#f9f5f2"
     };
-
+    
     function init() {
       renderGrid();
       renderPalette();
       setupCustomColor();
       applyInitialPattern();
+      fetchGallery();
     }
-
+    
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -353,7 +431,7 @@
         grid.appendChild(cell);
       }
     }
-
+    
     function renderPalette() {
       const palette = document.getElementById('palette');
       palette.innerHTML = '';
@@ -361,12 +439,12 @@
         const bucket = document.createElement('div');
         bucket.className = 'bucket';
         bucket.style.backgroundColor = color;
-        if (color === '#ffffff') bucket.style.border = '1px solid #ddd';
+        if (color === '#FFFFFF') bucket.style.border = '1px solid #ddd';
         if (color === selectedColor) bucket.classList.add('selected');
         bucket.addEventListener('click', () => selectColor(color, bucket));
         palette.appendChild(bucket);
       });
-
+      
       const customBucket = document.createElement('div');
       customBucket.className = 'bucket custom-bucket';
       customBucket.id = 'custom-bucket';
@@ -375,7 +453,7 @@
       customBucket.addEventListener('click', () => document.getElementById('custom-color-input').click());
       palette.appendChild(customBucket);
     }
-
+    
     function setupCustomColor() {
       const input = document.getElementById('custom-color-input');
       input.addEventListener('input', (e) => {
@@ -384,18 +462,18 @@
         selectColor(customColor, document.getElementById('custom-bucket'));
       });
     }
-
+    
     function selectColor(color, element) {
       selectedColor = color;
       document.querySelectorAll('.bucket').forEach(b => b.classList.remove('selected'));
       element.classList.add('selected');
     }
-
+    
     function paintCell(cell) {
       cell.style.backgroundColor = selectedColor;
       cell.dataset.color = selectedColor;
     }
-
+    
     function applyInitialPattern() {
       for (const [index, color] of Object.entries(initialPattern)) {
         const cell = document.getElementById(`cell-${index}`);
@@ -405,63 +483,116 @@
         }
       }
     }
-
+    
     function resetGrid() {
       document.querySelectorAll('.matrix div').forEach(cell => {
         cell.style.backgroundColor = '';
         delete cell.dataset.color;
       });
     }
-
+    
     function openSubmitModal() {
       document.getElementById('modalOverlay').style.display = 'flex';
       showModalState('form');
-      document.getElementById('artName').value = '';
-      document.getElementById('authorName').value = '';
     }
-
+    
     function closeModal() {
       document.getElementById('modalOverlay').style.display = 'none';
     }
-
+    
     function showModalState(state) {
       document.getElementById('modal-form').style.display = state === 'form' ? 'block' : 'none';
       document.getElementById('modal-loading').style.display = state === 'loading' ? 'block' : 'none';
       document.getElementById('modal-success').style.display = state === 'success' ? 'block' : 'none';
     }
-
+    
     async function processSubmission() {
       const artName = document.getElementById('artName').value.trim();
       const authorName = document.getElementById('authorName').value.trim();
       if (!artName || !authorName) return alert("Both fields are required!");
-
+      
       showModalState('loading');
       const mapping = {};
       for (let i = 0; i < ROWS * COLS; i++) {
         const color = document.getElementById(`cell-${i}`).dataset.color;
-        if (color) {
-          mapping[i] = color;
-        }
+        if (color) mapping[i] = color;
       }
-
+      
       try {
         const response = await fetch('/api/art', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: artName, author: authorName, mapping })
         });
-        if (response.ok) showModalState('success');
-        else {
-          const error = await response.json().catch(() => ({}));
-          alert('Failed: ' + (error.message || response.statusText));
+        if (response.ok) {
+          showModalState('success');
+          fetchGallery(); // Refresh gallery
+        } else {
           showModalState('form');
         }
       } catch (e) {
-        alert('An error occurred.');
         showModalState('form');
       }
     }
-
+    
+    async function fetchGallery(loadMore = false) {
+      const gallery = document.getElementById('gallery');
+      const loadMoreBtn = document.getElementById('load-more');
+      
+      if (!loadMore) {
+        gallery.innerHTML = '<p>Loading gallery...</p>';
+        nextCursor = null;
+      }
+      
+      const url = `/api/art?limit=20${nextCursor ? `&cursor=${nextCursor}` : ''}`;
+      
+      try {
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (!loadMore) gallery.innerHTML = '';
+        
+        result.data.forEach(art => {
+          const card = document.createElement('div');
+          card.className = 'art-card';
+          card.innerHTML = `
+            ${generateArtSVG(art.mapping)}
+            <div class="art-info">
+              <h3>${escapeHtml(art.name)}</h3>
+              <p>by ${escapeHtml(art.author)}</p>
+            </div>
+          `;
+          gallery.appendChild(card);
+        });
+        
+        nextCursor = result.next_cursor;
+        loadMoreBtn.style.display = nextCursor ? 'inline-block' : 'none';
+        
+        if (result.data.length === 0 && !loadMore) {
+          gallery.innerHTML = '<p>No art submitted yet. Be the first!</p>';
+        }
+      } catch (e) {
+        gallery.innerHTML = '<p>Failed to load gallery.</p>';
+      }
+    }
+    
+    function generateArtSVG(mapping) {
+      let rects = '';
+      for (let i = 0; i < 25; i++) {
+        const color = mapping[i] || '#ffffff';
+        const x = (i % 5) * 20;
+        const y = Math.floor(i / 5) * 20;
+        rects += `<rect x="${x}" y="${y}" width="20" height="20" fill="${color}" />`;
+      }
+      return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+    }
+    
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    
     init();
   </script>
 </body>

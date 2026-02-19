@@ -36,6 +36,24 @@ app.post("/api/art", async (c) => {
   }
 });
 
+// GET all art with pagination
+app.get("/api/art", async (c) => {
+  const limit = parseInt(c.req.query("limit") || "20");
+  const cursor = c.req.query("cursor");
+
+  const entries = kv.list({ prefix: ["art"] }, { limit, cursor, reverse: true });
+  const arts = [];
+  
+  for await (const entry of entries) {
+    arts.push(entry.value);
+  }
+
+  return c.json({
+    data: arts,
+    next_cursor: entries.cursor || null
+  });
+});
+
 // Serve index.html
 app.get("/", async (c) => {
   try {
