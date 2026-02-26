@@ -124,8 +124,10 @@
     
     .actions {
       display: flex;
-      gap: 1rem;
+      gap: 0.75rem;
       margin-top: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     
     button {
@@ -402,6 +404,14 @@
         Clear
       </button>
       
+      <button onclick="document.getElementById('image-upload').click()" title="Upload an image to parse colors">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        Upload
+      </button>
+
+      <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+      <canvas id="parse-canvas" width="5" height="5" style="display: none;"></canvas>
+
       <div class="dropdown">
         <button onclick="toggleDownloadMenu()" title="Download art in various formats">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -657,6 +667,50 @@
 
     function toggleDownloadMenu() {
       document.getElementById('download-menu').classList.toggle('show');
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.getElementById("parse-canvas");
+          const ctx = canvas.getContext("2d");
+          
+          // Draw image scaled to 5x5
+          ctx.clearRect(0, 0, 5, 5);
+          ctx.drawImage(img, 0, 0, 5, 5);
+
+          const imageData = ctx.getImageData(0, 0, 5, 5).data;
+          const mapping = {};
+
+          for (let i = 0; i < 25; i++) {
+            const index = i * 4;
+            const r = imageData[index];
+            const g = imageData[index + 1];
+            const b = imageData[index + 2];
+            const a = imageData[index + 3];
+
+            // Only map if not fully transparent
+            if (a > 0) {
+              const hex = "#" + 
+                r.toString(16).padStart(2, "0") + 
+                g.toString(16).padStart(2, "0") + 
+                b.toString(16).padStart(2, "0");
+              mapping[i] = hex;
+            }
+          }
+
+          loadArtIntoEditor(mapping);
+          // Reset file input for same-file re-uploads
+          event.target.value = '';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     // Close dropdown when clicking outside
