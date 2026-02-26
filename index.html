@@ -190,6 +190,11 @@
       transform: translateY(-4px);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
+
+    .art-preview:hover svg {
+      border-color: var(--accent-color);
+      transform: scale(1.02);
+    }
     
     .art-card svg {
       width: 120px;
@@ -200,6 +205,7 @@
       margin-left: auto;
       margin-right: auto;
       border: 1px solid #eee;
+      transition: var(--transition);
     }
     
     .art-info h3 {
@@ -327,7 +333,9 @@
     </div>
     
     <div class="actions">
-      <button onclick="resetGrid()">Clear Canvas</button>
+      <button onclick="resetGrid()" title="Clear the entire grid">Clear</button>
+      <button onclick="downloadSVG()" title="Download as SVG file">SVG</button>
+      <button onclick="downloadPNG()" title="Download as PNG image">PNG</button>
       <button class="primary" onclick="openSubmitModal()">Submit</button>
     </div>
   </div>
@@ -428,8 +436,14 @@
         const cell = document.createElement('div');
         cell.id = `cell-${i}`;
         cell.addEventListener('click', () => paintCell(cell));
+        cell.addEventListener('dblclick', () => resetCell(cell));
         grid.appendChild(cell);
       }
+    }
+
+    function resetCell(cell) {
+      cell.style.backgroundColor = '';
+      delete cell.dataset.color;
     }
     
     function renderPalette() {
@@ -489,6 +503,56 @@
         cell.style.backgroundColor = '';
         delete cell.dataset.color;
       });
+    }
+
+    function downloadSVG() {
+      const mapping = {};
+      for (let i = 0; i < ROWS * COLS; i++) {
+        const color = document.getElementById(`cell-${i}`).dataset.color;
+        if (color) mapping[i] = color;
+      }
+      const svgContent = generateArtSVG(mapping);
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'penta-square-art.svg';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadPNG() {
+      const canvas = document.createElement('canvas');
+      const size = 500; // 500x500 for good quality
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const cellSize = size / 5;
+
+      for (let i = 0; i < ROWS * COLS; i++) {
+        const color = document.getElementById(`cell-${i}`).dataset.color || '#ffffff';
+        const x = (i % 5) * cellSize;
+        const y = Math.floor(i / 5) * cellSize;
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, cellSize, cellSize);
+      }
+
+      const link = document.createElement('a');
+      link.download = 'penta-square-art.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function loadArtIntoEditor(mapping) {
+      resetGrid();
+      for (const [index, color] of Object.entries(mapping)) {
+        const cell = document.getElementById(`cell-${index}`);
+        if (cell) {
+          cell.style.backgroundColor = color;
+          cell.dataset.color = color;
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
     function openSubmitModal() {
@@ -556,12 +620,19 @@
           const card = document.createElement('div');
           card.className = 'art-card';
           card.innerHTML = `
-            ${generateArtSVG(art.mapping)}
+            <div class="art-preview" style="cursor: pointer;" title="Click to load into editor">
+              ${generateArtSVG(art.mapping)}
+            </div>
             <div class="art-info">
               <h3>${escapeHtml(art.name)}</h3>
               <p>by ${escapeHtml(art.author)}</p>
             </div>
           `;
+          
+          card.querySelector('.art-preview').addEventListener('click', () => {
+            loadArtIntoEditor(art.mapping);
+          });
+          
           gallery.appendChild(card);
         });
         
