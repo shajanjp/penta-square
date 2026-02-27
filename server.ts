@@ -54,6 +54,22 @@ app.get("/api/art", async (c) => {
   });
 });
 
+// DELETE an art by ID
+app.delete("/api/art/:id", async (c) => {
+  const id = c.req.param("id");
+  try {
+    const entry = await kv.get(["art", id]);
+    if (!entry.value) {
+      return c.json({ message: "Art not found" }, 404);
+    }
+    await kv.delete(["art", id]);
+    return c.json({ message: "Art deleted successfully" }, 200);
+  } catch (error) {
+    console.error("Failed to delete art:", error);
+    return c.json({ message: "Internal Server Error", error: error.message }, 500);
+  }
+});
+
 // Serve index.html
 app.get("/", async (c) => {
   try {
