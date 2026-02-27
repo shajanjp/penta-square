@@ -1,10 +1,13 @@
 import { Hono } from "https://deno.land/x/hono@v4.0.0/mod.ts";
-import { logger } from "https://deno.land/x/hono@v4.0.0/middleware.ts";
+import { logger, serveStatic } from "https://deno.land/x/hono@v4.0.0/middleware.ts";
 
 const app = new Hono();
 const kv = await Deno.openKv();
 
 app.use("*", logger());
+
+// Serve static assets
+app.use("/assets/*", serveStatic({ root: "./" }));
 
 // API to submit art
 app.post("/api/art", async (c) => {
