@@ -130,7 +130,7 @@
       justify-content: center;
     }
     
-    button {
+    button, .button-label {
       background: none;
       border: 1px solid #dfe6e9;
       padding: 0.5rem 1rem;
@@ -143,14 +143,16 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    button svg {
+    button svg, .button-label svg {
       width: 16px;
       height: 16px;
     }
     
-    button:hover {
+    button:hover, .button-label:hover {
       background-color: #f1f2f6;
       color: var(--text-primary);
       border-color: #b2bec3;
@@ -395,7 +397,6 @@
     <div class="palette-container">
       <div class="palette-label">Palette</div>
       <div class="palette-grid" id="palette"></div>
-      <input type="color" id="custom-color-input" style="display: none;">
     </div>
     
     <div class="actions">
@@ -404,12 +405,12 @@
         Clear
       </button>
       
-      <button onclick="document.getElementById('image-upload').click()" title="Upload an image to parse colors">
+      <label class="button-label" title="Upload an image to parse colors">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
         Upload
-      </button>
+        <input type="file" id="image-upload" accept="image/*" style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;" onchange="handleImageUpload(event)">
+      </label>
 
-      <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
       <canvas id="parse-canvas" width="5" height="5" style="display: none;"></canvas>
 
       <div class="dropdown">
@@ -544,7 +545,6 @@
     function init() {
       renderGrid();
       renderPalette();
-      setupCustomColor();
       applyInitialPattern();
       fetchGallery();
     }
@@ -583,18 +583,24 @@
       customBucket.className = 'bucket custom-bucket';
       customBucket.id = 'custom-bucket';
       customBucket.style.backgroundColor = customColor;
-      customBucket.innerHTML = '<span style="font-size: 18px; color: #fff; text-shadow: 0 0 2px #000; line-height: 32px; display: block; text-align: center;">+</span>';
-      customBucket.addEventListener('click', () => document.getElementById('custom-color-input').click());
+      customBucket.style.position = 'relative';
+      customBucket.style.overflow = 'hidden';
+      customBucket.innerHTML = `
+        <span style="font-size: 18px; color: #fff; text-shadow: 0 0 2px #000; line-height: 32px; display: block; text-align: center; pointer-events: none;">+</span>
+        <input type="color" id="custom-color-input" value="${customColor}" 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; padding: 0;">
+      `;
       palette.appendChild(customBucket);
-    }
-    
-    function setupCustomColor() {
-      const input = document.getElementById('custom-color-input');
-      input.addEventListener('input', (e) => {
+
+      // Setup the event listener for the nested input
+      const input = customBucket.querySelector('#custom-color-input');
+      const handleColorChange = (e) => {
         customColor = e.target.value;
-        document.getElementById('custom-bucket').style.backgroundColor = customColor;
-        selectColor(customColor, document.getElementById('custom-bucket'));
-      });
+        customBucket.style.backgroundColor = customColor;
+        selectColor(customColor, customBucket);
+      };
+      input.addEventListener('input', handleColorChange);
+      input.addEventListener('change', handleColorChange);
     }
     
     function selectColor(color, element) {
