@@ -76,18 +76,40 @@
     
     .matrix {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(var(--grid-size, 5), 1fr);
       background: #eee;
       border-radius: 4px;
       border: 1px solid #DDD;
     }
     
     .matrix div {
-      width: 50px;
-      height: 50px;
+      width: clamp(30px, 8vw, 50px);
+      height: clamp(30px, 8vw, 50px);
       background-color: #fff;
       cursor: pointer;
       transition: background-color 0.1s ease;
+    }
+
+    .size-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      background: #eee;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    
+    .size-toggle button {
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      border: none;
+      background: transparent;
+    }
+    
+    .size-toggle button.active {
+      background-color: white;
+      color: var(--text-primary);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .matrix div:hover {
@@ -407,6 +429,11 @@
       <p>Select a color and paint pixels.</p>
     </header>
     
+    <div class="size-toggle">
+      <button id="size-5" class="active" onclick="setGridSize(5)">5x5</button>
+      <button id="size-8" onclick="setGridSize(8)">8x8</button>
+    </div>
+    
     <div class="matrix" id="grid"></div>
     
     <div class="palette-container">
@@ -503,12 +530,23 @@
   </div>
   
   <script>
-    const ROWS = 5;
-    const COLS = 5;
+    let gridSize = 5;
     let selectedColor = "#000000";
     let customColor = "#000000";
     let nextCursor = null;
     
+    function setGridSize(size) {
+      if (gridSize === size) return;
+      if (confirm("Changing size will clear the grid. Continue?")) {
+        gridSize = size;
+        document.getElementById('size-5').classList.toggle('active', size === 5);
+        document.getElementById('size-8').classList.toggle('active', size === 8);
+        document.documentElement.style.setProperty('--grid-size', size);
+        renderGrid();
+        fetchGallery();
+      }
+    }
+
     const colors = [
     "#f44336",
     "#e91e63",
@@ -567,7 +605,7 @@
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
-      for (let i = 0; i < ROWS * COLS; i++) {
+      for (let i = 0; i < gridSize * gridSize; i++) {
         const cell = document.createElement('div');
         cell.id = `cell-${i}`;
         cell.addEventListener('click', () => paintCell(cell));
@@ -648,16 +686,16 @@
 
     function downloadSVG() {
       const mapping = {};
-      for (let i = 0; i < ROWS * COLS; i++) {
+      for (let i = 0; i < gridSize * gridSize; i++) {
         const color = document.getElementById(`cell-${i}`).dataset.color;
         if (color) mapping[i] = color;
       }
-      const svgContent = generateArtSVG(mapping);
+      const svgContent = generateArtSVG(mapping, gridSize);
       const blob = new Blob([svgContent], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'penta-square-art.svg';
+      link.download = `penta-square-art-${gridSize}x${gridSize}.svg`;
       link.click();
       URL.revokeObjectURL(url);
       document.getElementById('download-menu').classList.remove('show');
@@ -665,22 +703,22 @@
 
     function downloadPNG() {
       const canvas = document.createElement('canvas');
-      const size = 500; // 500x500 for good quality
+      const size = 512; // Adjusted for 8x8 as well
       canvas.width = size;
       canvas.height = size;
       const ctx = canvas.getContext('2d');
-      const cellSize = size / 5;
+      const cellSize = size / gridSize;
 
-      for (let i = 0; i < ROWS * COLS; i++) {
+      for (let i = 0; i < gridSize * gridSize; i++) {
         const color = document.getElementById(`cell-${i}`).dataset.color || '#ffffff';
-        const x = (i % 5) * cellSize;
-        const y = Math.floor(i / 5) * cellSize;
+        const x = (i % gridSize) * cellSize;
+        const y = Math.floor(i / gridSize) * cellSize;
         ctx.fillStyle = color;
         ctx.fillRect(x, y, cellSize, cellSize);
       }
 
       const link = document.createElement('a');
-      link.download = 'penta-square-art.png';
+      link.download = `penta-square-art-${gridSize}x${gridSize}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       document.getElementById('download-menu').classList.remove('show');
@@ -701,14 +739,17 @@
           const canvas = document.getElementById("parse-canvas");
           const ctx = canvas.getContext("2d");
           
-          // Draw image scaled to 5x5
-          ctx.clearRect(0, 0, 5, 5);
-          ctx.drawImage(img, 0, 0, 5, 5);
+          canvas.width = gridSize;
+          canvas.height = gridSize;
 
-          const imageData = ctx.getImageData(0, 0, 5, 5).data;
+          // Draw image scaled to gridSize x gridSize
+          ctx.clearRect(0, 0, gridSize, gridSize);
+          ctx.drawImage(img, 0, 0, gridSize, gridSize);
+
+          const imageData = ctx.getImageData(0, 0, gridSize, gridSize).data;
           const mapping = {};
 
-          for (let i = 0; i < 25; i++) {
+          for (let i = 0; i < gridSize * gridSize; i++) {
             const index = i * 4;
             const r = imageData[index];
             const g = imageData[index + 1];
@@ -725,7 +766,7 @@
             }
           }
 
-          loadArtIntoEditor(mapping);
+          loadArtIntoEditor(mapping, gridSize);
           // Reset file input for same-file re-uploads
           event.target.value = '';
         };
@@ -744,8 +785,14 @@
       }
     });
 
-    function loadArtIntoEditor(mapping) {
-      resetGrid();
+    function loadArtIntoEditor(mapping, size = 5) {
+      // Set grid size first
+      gridSize = size;
+      document.getElementById('size-5').classList.toggle('active', size === 5);
+      document.getElementById('size-8').classList.toggle('active', size === 8);
+      document.documentElement.style.setProperty('--grid-size', size);
+      
+      renderGrid();
       for (const [index, color] of Object.entries(mapping)) {
         const cell = document.getElementById(`cell-${index}`);
         if (cell) {
@@ -786,7 +833,7 @@
       localStorage.setItem('penta-square-author', authorName);
       
       const mapping = {};
-      for (let i = 0; i < ROWS * COLS; i++) {
+      for (let i = 0; i < gridSize * gridSize; i++) {
         const color = document.getElementById(`cell-${i}`).dataset.color;
         if (color) mapping[i] = color;
       }
@@ -795,7 +842,7 @@
         const response = await fetch('/api/art', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: artName, author: authorName, mapping })
+          body: JSON.stringify({ name: artName, author: authorName, mapping, size: gridSize })
         });
         if (response.ok) {
           showModalState('success');
@@ -817,7 +864,7 @@
         nextCursor = null;
       }
       
-      const url = `/api/art?limit=20${nextCursor ? `&cursor=${nextCursor}` : ''}`;
+      const url = `/api/art?limit=20&size=${gridSize}${nextCursor ? `&cursor=${nextCursor}` : ''}`;
       
       try {
         const response = await fetch(url);
@@ -828,18 +875,19 @@
         result.data.forEach(art => {
           const card = document.createElement('div');
           card.className = 'art-card';
+          const artSize = art.size || 5;
           card.innerHTML = `
             <div class="art-preview" style="cursor: pointer;" title="Click to load into editor">
-              ${generateArtSVG(art.mapping)}
+              ${generateArtSVG(art.mapping, artSize)}
             </div>
             <div class="art-info">
               <h3>${escapeHtml(art.name)}</h3>
-              <p>by ${escapeHtml(art.author)}</p>
+              <p>by ${escapeHtml(art.author)} (${artSize}x${artSize})</p>
             </div>
           `;
           
           card.querySelector('.art-preview').addEventListener('click', () => {
-            loadArtIntoEditor(art.mapping);
+            loadArtIntoEditor(art.mapping, artSize);
           });
           
           gallery.appendChild(card);
@@ -856,13 +904,14 @@
       }
     }
     
-    function generateArtSVG(mapping) {
+    function generateArtSVG(mapping, size = 5) {
       let rects = '';
-      for (let i = 0; i < 25; i++) {
+      const pixelSize = 100 / size;
+      for (let i = 0; i < size * size; i++) {
         const color = mapping[i] || '#ffffff';
-        const x = (i % 5) * 20;
-        const y = Math.floor(i / 5) * 20;
-        rects += `<rect x="${x}" y="${y}" width="20" height="20" fill="${color}" />`;
+        const x = (i % size) * pixelSize;
+        const y = Math.floor(i / size) * pixelSize;
+        rects += `<rect x="${x}" y="${y}" width="${pixelSize}" height="${pixelSize}" fill="${color}" />`;
       }
       return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
     }

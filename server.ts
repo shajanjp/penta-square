@@ -13,7 +13,7 @@ app.use("/assets/*", serveStatic({ root: "./" }));
 app.post("/api/art", async (c) => {
   try {
     const body = await c.req.json();
-    const { name, author, mapping } = body;
+    const { name, author, mapping, size } = body;
 
     if (!name || !author || !mapping) {
       return c.json({ message: "Missing required fields: name, author, or mapping" }, 400);
@@ -21,17 +21,19 @@ app.post("/api/art", async (c) => {
 
     const id = crypto.randomUUID();
     const timestamp = Date.now();
+    const artSize = size || 5;
     
-    // Store in Deno KV using a composite key for better indexing later if needed
-    await kv.set(["art", id], {
+    // Store in Deno KV using size in the key for efficient filtering
+    await kv.set(["art", artSize, id], {
       id,
       name,
       author,
       mapping,
+      size: artSize,
       createdAt: timestamp
     });
 
-    console.log(`Stored art: ${name} by ${author} (${id})`);
+    console.log(`Stored ${artSize}x${artSize} art: ${name} by ${author} (${id})`);
     return c.json({ message: "Art submitted successfully!", id }, 201);
   } catch (error) {
     console.error("Failed to store art:", error);
@@ -39,15 +41,19 @@ app.post("/api/art", async (c) => {
   }
 });
 
-// GET all art with pagination
+// GET all art with pagination and size filter
 app.get("/api/art", async (c) => {
   const limit = parseInt(c.req.query("limit") || "20");
   const cursor = c.req.query("cursor");
-
-  const entries = kv.list({ prefix: ["art"] }, { limit, cursor, reverse: true });
-  const arts = [];
+  const sizeQuery = c.req.query("size");
   
+  const prefix = sizeQuery ? ["art", parseInt(sizeQuery)] : ["art"];
+  const entries = kv.list({ prefix }, { limit, cursor, reverse: true });
+  
+  const arts = [];
   for await (const entry of entries) {
+    // Handle both old format ["art", id] and new format ["art", size, id]
+    // If prefix is ["art"], entry.key could be ["art", id] or ["art", size, id]
     arts.push(entry.value);
   }
 
@@ -61,12 +67,23 @@ app.get("/api/art", async (c) => {
 app.delete("/api/art/:id", async (c) => {
   const id = c.req.param("id");
   try {
-    const entry = await kv.get(["art", id]);
-    if (!entry.value) {
-      return c.json({ message: "Art not found" }, 404);
+    // Try old format first
+    let entry = await kv.get(["art", id]);
+    if (entry.value) {
+      await kv.delete(["art", id]);
+      return c.json({ message: "Art deleted successfully" }, 200);
     }
-    await kv.delete(["art", id]);
-    return c.json({ message: "Art deleted successfully" }, 200);
+    
+    // Try new format (check both common sizes)
+    for (const size of [5, 8]) {
+      entry = await kv.get(["art", size, id]);
+      if (entry.value) {
+        await kv.delete(["art", size, id]);
+        return c.json({ message: "Art deleted successfully" }, 200);
+      }
+    }
+
+    return c.json({ message: "Art not found" }, 404);
   } catch (error) {
     console.error("Failed to delete art:", error);
     return c.json({ message: "Internal Server Error", error: error.message }, 500);
