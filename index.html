@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penta Square</title>
+  <title>LittlePix</title>
   <meta name="keywords" content="5x5 pixel art, 25 pixel art, minimal art project, pixel canvas, M5 Atom Matrix, M5Stack project, Arduino LED matrix, IoT art display, Scriptable iOS widget, JavaScript pixel app, creative coding, micro art, constrained design" />
   
   <!-- Favicon -->
@@ -11,16 +11,16 @@
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://penta-square.deno.dev/">
-  <meta property="og:title" content="Penta Square">
+  <meta property="og:url" content="https://littlepix.deno.dev/">
+  <meta property="og:title" content="LittlePix">
   <meta property="og:description" content="Create, share, and explore 5x5 pixel art. Paint your own or upload images to generate patterns.">
-  <meta property="og:image" content="/assets/penta-square-logo.png">
+  <meta property="og:image" content="/assets/littlepix-logo.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Penta Square">
+  <meta property="twitter:title" content="LittlePix">
   <meta property="twitter:description" content="Create, share, and explore 5x5 pixel art. Paint your own or upload images to generate patterns.">
-  <meta property="twitter:image" content="/assets/penta-square-logo.png">
+  <meta property="twitter:image" content="/assets/littlepix-logo.png">
 
   <style>
     :root {
@@ -425,7 +425,7 @@
   
   <div class="app-container">
     <header>
-      <h1>Penta Square</h1>
+      <h1>LittlePix</h1>
       <p>Select a color and paint pixels.</p>
     </header>
     
@@ -695,7 +695,7 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `penta-square-art-${gridSize}x${gridSize}.svg`;
+      link.download = `littlepix-art-${gridSize}x${gridSize}.svg`;
       link.click();
       URL.revokeObjectURL(url);
       document.getElementById('download-menu').classList.remove('show');
@@ -718,7 +718,7 @@
       }
 
       const link = document.createElement('a');
-      link.download = `penta-square-art-${gridSize}x${gridSize}.png`;
+      link.download = `littlepix-art-${gridSize}x${gridSize}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       document.getElementById('download-menu').classList.remove('show');
@@ -804,7 +804,7 @@
     }
     
     function openSubmitModal() {
-      const savedAuthor = localStorage.getItem('penta-square-author');
+      const savedAuthor = localStorage.getItem('littlepix-author');
       if (savedAuthor) {
         document.getElementById('authorName').value = savedAuthor;
       }
@@ -830,7 +830,7 @@
       showModalState('loading');
       
       // Store author name for next time
-      localStorage.setItem('penta-square-author', authorName);
+      localStorage.setItem('littlepix-author', authorName);
       
       const mapping = {};
       for (let i = 0; i < gridSize * gridSize; i++) {
